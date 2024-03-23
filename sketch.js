@@ -65,6 +65,9 @@ function draw() {
   // transform
   pg.resetMatrix();
 
+  // pg.orbitControl();
+  // https://stackoverflow.com/questions/68986225/orbitcontrol-in-creategraphics-webgl-on-a-2d-canvas
+
   // geometry
   switch (modelIndex) {
     case 0:
