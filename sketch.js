@@ -4,7 +4,12 @@ let pixelSizeSlider;
 let nextButton;
 let previousButton;
 let modelIndex = 0;
-let numOfModels = 4;
+let numOfModels = 5;
+
+function sine3d(t) {
+    let s = 200;
+    return createVector(sin(2 * t) * s, sin(5 * t) * s, sin(3 * t) * s);
+}
 
 function preload() {
     pixelShader = loadShader("shader.vert", "shader.frag");
@@ -90,6 +95,17 @@ function draw() {
             pg.rotateZ(frameCount * 0.02);
             pg.cylinder(min(width, height) / 6, min(width, height) / 2);
             break;
+        case 3:
+            let time = frameCount / 60;
+            pg.rotateX(frameCount * 0.02);
+            pg.rotateY(frameCount * 0.02);
+            for(let i = 0 + time; i <= 3 + time; i += map(i, time, 3 + time, 0.01, 0.04)) {
+                let pos = sine3d(i);
+                pg.translate(pos.x, pos.y, pos.z);
+                pg.sphere(map(i, time, 3 + time, 10, 40));
+                pg.translate(-pos.x, -pos.y, -pos.z);
+            }
+            break;
         default:
             pg.rotateX(frameCount * 0.02);
             pg.rotateZ(frameCount * 0.02);
@@ -99,6 +115,7 @@ function draw() {
     // put some geometry on the screen
     fill(200, 0, 0);
     rect(-width / 2, -height / 2, width, height);
+    // image(pg, -width/2, -height/2);
 }
 
 function windowResized() {
