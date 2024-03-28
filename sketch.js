@@ -6,8 +6,7 @@ let previousButton;
 let modelIndex = 0;
 let numOfModels = 5;
 
-function sine3d(t) {
-    let s = 200;
+function sine3d(t, s) {
     return createVector(sin(2 * t) * s, sin(5 * t) * s, sin(3 * t) * s);
 }
 
@@ -100,7 +99,7 @@ function draw() {
             pg.rotateX(frameCount * 0.02);
             pg.rotateY(frameCount * 0.02);
             for(let i = 0 + time; i <= 3 + time; i += map(i, time, 3 + time, 0.01, 0.04)) {
-                let pos = sine3d(i);
+                let pos = sine3d(i, min(width, height) / 5);
                 pg.translate(pos.x, pos.y, pos.z);
                 pg.sphere(map(i, time, 3 + time, 10, 40));
                 pg.translate(-pos.x, -pos.y, -pos.z);
