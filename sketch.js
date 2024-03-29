@@ -52,7 +52,8 @@ function cartesianToSpherical(x, y, z) {
     return { r: r, theta: theta, phi: phi };
 }
 
-p5.Graphics.prototype.cylinderAbsolute = function (x1, y1, z1, x2, y2, z2, r) {
+p5.Graphics.prototype.cylinderAbsolute = function (p1, p2, r) {
+    let [x1, y1, z1, x2, y2, z2] = [p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]];
     sphCoords = cartesianToSpherical(x2 - x1, y2 - y1, z2 - z1);
 
     this.translate((x2 + x1) / 2, (y2 + y1) / 2, (z2 + z1) / 2);
@@ -66,40 +67,33 @@ p5.Graphics.prototype.cylinderAbsolute = function (x1, y1, z1, x2, y2, z2, r) {
     this.translate(-(x2 + x1) / 2, -(y2 + y1) / 2, -(z2 + z1) / 2);
 };
 
+function elementWiseMult(arr1, arr2) {
+    return arr1.map((v, i) => v * arr2[i]);
+}
+
 p5.Graphics.prototype.hypercube = function (size, cylRadius) {
     let pos = [0, 1, 2, 3].map((v) => {
         return hypercubeNodes(frameCount / 100 + v, size / 2);
     });
 
     // initial frame
-    let mirror = [
+    let copies = [
         [1, 1, 1],
         [1, -1, 1],
         [1, 1, -1],
         [1, -1, -1],
     ];
-    mirror.forEach((mi) => {
+    copies.forEach((co) => {
         for (let i = 0; i < 4; i++) {
             this.cylinderAbsolute(
-                mi[0] * pos[i][0],
-                mi[1] * pos[i][1],
-                mi[2] * pos[i][2],
-                mi[0] * pos[(i + 1) % 4][0],
-                mi[1] * pos[(i + 1) % 4][1],
-                mi[2] * pos[(i + 1) % 4][2],
+                elementWiseMult(co, pos[i]),
+                elementWiseMult(co, pos[(i + 1) % 4]),
                 cylRadius
             );
-            this.translate(
-                mi[0] * pos[i][0],
-                mi[1] * pos[i][1],
-                mi[2] * pos[i][2]
-            );
+            let trans = elementWiseMult(co, pos[i]);
+            this.translate(trans[0], trans[1], trans[2]);
             this.sphere(cylRadius);
-            this.translate(
-                -mi[0] * pos[i][0],
-                -mi[1] * pos[i][1],
-                -mi[2] * pos[i][2]
-            );
+            this.translate(-trans[0], -trans[1], -trans[2]);
         }
     });
 
@@ -108,18 +102,14 @@ p5.Graphics.prototype.hypercube = function (size, cylRadius) {
         [1, 1, 1],
         [1, 1, -1],
     ];
+    let reflect = [1, -1, 1];
     tmp.forEach((tm) => {
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 4; i++)
             this.cylinderAbsolute(
-                tm[0] * pos[i][0],
-                tm[1] * pos[i][1],
-                tm[2] * pos[i][2],
-                tm[0] * pos[i][0],
-                -tm[1] * pos[i][1],
-                tm[2] * pos[i][2],
+                elementWiseMult(tm, pos[i]),
+                elementWiseMult(elementWiseMult(tm, pos[i]), reflect),
                 cylRadius
             );
-        }
     });
 
     // z-axis connection
@@ -127,18 +117,14 @@ p5.Graphics.prototype.hypercube = function (size, cylRadius) {
         [1, 1, 1],
         [1, -1, 1],
     ];
+    reflect = [1, 1, -1];
     tmp2.forEach((tm) => {
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 4; i++)
             this.cylinderAbsolute(
-                tm[0] * pos[i][0],
-                tm[1] * pos[i][1],
-                tm[2] * pos[i][2],
-                tm[0] * pos[i][0],
-                tm[1] * pos[i][1],
-                -tm[2] * pos[i][2],
+                elementWiseMult(tm, pos[i]),
+                elementWiseMult(elementWiseMult(tm, pos[i]), reflect),
                 cylRadius
             );
-        }
     });
 };
 
