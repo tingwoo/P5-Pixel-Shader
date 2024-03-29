@@ -37,6 +37,7 @@ function hyperCubeUtilZ(t) {
 }
 
 function hypercubeNodes(t, innerSize) {
+    // four nodes have gaps of 1 between them.
     return [
         innerSize * (2.33 * cos(hyperCubeUtilT(t))),
         innerSize * (1.635 + 0.7 * sin(hyperCubeUtilT(t))),
@@ -76,55 +77,45 @@ p5.Graphics.prototype.hypercube = function (size, cylRadius) {
         return hypercubeNodes(frameCount / 100 + v, size / 2);
     });
 
-    // initial frame
-    let copies = [
+    // four basic frames
+    let frames = [
         [1, 1, 1],
         [1, -1, 1],
         [1, 1, -1],
         [1, -1, -1],
     ];
-    copies.forEach((co) => {
+    frames.forEach((fr) => {
         for (let i = 0; i < 4; i++) {
             this.cylinderAbsolute(
-                elementWiseMult(co, pos[i]),
-                elementWiseMult(co, pos[(i + 1) % 4]),
+                elementWiseMult(fr, pos[i]),
+                elementWiseMult(fr, pos[(i + 1) % 4]),
                 cylRadius
             );
-            let trans = elementWiseMult(co, pos[i]);
+            let trans = elementWiseMult(fr, pos[i]);
             this.translate(trans[0], trans[1], trans[2]);
             this.sphere(cylRadius);
             this.translate(-trans[0], -trans[1], -trans[2]);
         }
     });
 
-    // vertical connection
-    let tmp = [
-        [1, 1, 1],
-        [1, 1, -1],
+    let partners = [
+        [1, 1, -1], // partner for vertical connection
+        [1, -1, 1], // partner for z-axis connection
     ];
-    let reflect = [1, -1, 1];
-    tmp.forEach((tm) => {
-        for (let i = 0; i < 4; i++)
+    partners.forEach((pa, j) => {
+        let reflect = partners[(j + 1) % 2];
+        for (let i = 0; i < 4; i++) {
             this.cylinderAbsolute(
-                elementWiseMult(tm, pos[i]),
-                elementWiseMult(elementWiseMult(tm, pos[i]), reflect),
+                elementWiseMult([1, 1, 1], pos[i]),
+                elementWiseMult(elementWiseMult([1, 1, 1], pos[i]), reflect),
                 cylRadius
             );
-    });
-
-    // z-axis connection
-    let tmp2 = [
-        [1, 1, 1],
-        [1, -1, 1],
-    ];
-    reflect = [1, 1, -1];
-    tmp2.forEach((tm) => {
-        for (let i = 0; i < 4; i++)
             this.cylinderAbsolute(
-                elementWiseMult(tm, pos[i]),
-                elementWiseMult(elementWiseMult(tm, pos[i]), reflect),
+                elementWiseMult(pa, pos[i]),
+                elementWiseMult(elementWiseMult(pa, pos[i]), reflect),
                 cylRadius
             );
+        }
     });
 };
 
@@ -188,7 +179,6 @@ function draw() {
     pg.noStroke();
     pg.fill(255);
 
-    // transform
     pg.resetMatrix();
 
     // pg.orbitControl();
