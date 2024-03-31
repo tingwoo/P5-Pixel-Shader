@@ -72,9 +72,9 @@ function elementWiseMult(arr1, arr2) {
     return arr1.map((v, i) => v * arr2[i]);
 }
 
-p5.Graphics.prototype.hypercube = function (size, cylRadius) {
+p5.Graphics.prototype.hypercube = function (time, size, cylRadius) {
     let pos = [0, 1, 2, 3].map((v) => {
-        return hypercubeNodes(frameCount / 100 + v, size / 2);
+        return hypercubeNodes(time + v, size / 2);
     });
 
     // four basic frames
@@ -198,7 +198,7 @@ function draw() {
         case 2:
             pg.rotateY(frameCount * 0.007);
             pg.rotateX(-0.4);
-            pg.hypercube(minDim / 5, minDim / 65);
+            pg.hypercube(frameCount / 100, minDim / 5, minDim / 65);
             break;
         case 3:
             pg.rotateX(frameCount * 0.02);
